@@ -1,0 +1,38 @@
+# Connected Conform Manager — public repo. Tracked: flame_ccm.py, README.md,
+# LICENSE, .gitignore, docs/*.png. Everything else stays local.
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Tool state — never commit user or project data. Settings hold local paths;
+# conform_state.json holds real sequence and segment names.
+*.json
+*.tmp
+*.corrupt
+preview_cache/
+flame_ccm/
+
+# Diagnostics output (anonymized, but it lists project and storage ids)
+flame_ccm_probe.txt
+*probe*.txt
+tw_setup_dump*
+*.timewarp_node
+
+# Media, frames and edit lists could be client material
+*.jpg
+*.jpeg
+*.exr
+*.dpx
+*.mov
+*.edl
+*.EDL
+
+# Release tooling never belongs here
+release_notes/
+backups/
+.claude/
+
+# OS
+.DS_Store
