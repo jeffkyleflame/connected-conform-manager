@@ -1,6 +1,6 @@
 """
 Script Name: Connected Conform Manager
-Script Version: 0.9.9
+Script Version: 0.9.10
 Flame Version: 2027 (verified working on 2026)
 Written by: Jeff Kyle
 Creation Date: 06.13.26
@@ -18,16 +18,17 @@ Description:
 
     STATUS: PUBLIC BETA (0.9.x). The audits and views are used on real jobs;
     some sections are unfinished and say so in the tool:
-        - The Hub and Ledger tabs are UNDER DEVELOPMENT: Source Segment
-          Connections and Duplicate Connected Segment are not in Flame's
-          python API, and the connect -> publish workflow depends on both.
-          CCM hands those steps to Flame's native tools and verifies the
-          result.
-        - Post Publish relink is not built yet.
+        - The Hub tab is UNDER DEVELOPMENT: Source Segment Connections are not
+          in Flame's python API, and the hub's connect step depends on them.
+          CCM hands that step to Flame's native tools and verifies the result.
+        - Create Conform Hub's current build (with stacked pieces) and
+          stack-aware Renumber are built but not yet verified on a real job.
         - Remove from Hub is experimental and untested.
-        - Create Conform Hub's current build (with stacked pieces), stack-aware
-          Renumber and Prep Publish Fix mode are built but not yet verified on
-          a real job.
+        - The publish workflow is COMING SOON. The Ledger tab already lists
+          each hub shot and its Publish NN snapshots; Prep Publish (Fix mode
+          included) and the Ledger's openclip / version columns are built but
+          not yet verified on a real job, and relinking after Flame's publish
+          is not built yet.
     CCM is READ-ONLY by default: nothing on a timeline changes until you allow
     changes in Settings. One shared scan feeds every audit and view, and it
     re-derives almost everything live (placement from connections, identity
@@ -68,7 +69,8 @@ Description:
         Timelines     - the map + the coverage drawer.
         Connections   - the braid + family tree; double-click selects the
                         connected segments in Flame.
-        Hub / Ledger  - (WIP) Conform Hub audit + build; publish ledger + prep.
+        Hub           - (WIP) Conform Hub audit + build.
+        Ledger        - (coming soon) publish ledger + Prep Publish.
         Settings      - sources-sequence name, handles, camera token, match chars,
                         scope, state folder, display units.
 
@@ -104,31 +106,41 @@ if not log.handlers:
 # Shown in the window header, the window title and the probe dump. Pre-1.0 on
 # purpose: public, but with unfinished sections (BETA_NOTE). Keep "Script
 # Version" in the docstring above in step -- the test suite checks it.
-__version__ = "0.9.9"
+__version__ = "0.9.10"
 
 BETA_NOTE = (
     "Public beta. The audits and views are used on real jobs; these sections "
     "are unfinished:\n"
-    "  • The Hub and Ledger tabs are UNDER DEVELOPMENT: Source Segment "
-    "Connections and Duplicate Connected Segment are not in Flame's python "
-    "API, and the connect → publish workflow depends on both. CCM hands "
-    "those steps to Flame's native tools and verifies the result.\n"
-    "  • Post Publish relink is not built yet.\n"
+    "  • The Hub tab is UNDER DEVELOPMENT: Source Segment Connections are not "
+    "in Flame's python API, and the hub's connect step depends on them. CCM "
+    "hands that step to Flame's native tools and verifies the result.\n"
+    "  • Create Conform Hub's current build (with stacked pieces) and "
+    "stack-aware Renumber are built but not yet verified on a real job.\n"
     "  • Remove from Hub is experimental and untested.\n"
-    "  • Create Conform Hub's current build (with stacked pieces), stack-aware "
-    "Renumber and Prep Publish Fix mode are built but not yet verified on a "
-    "real job.\n\n"
+    "  • The publish workflow is COMING SOON. The Ledger tab already lists "
+    "each hub shot and its Publish NN snapshots; Prep Publish (Fix mode "
+    "included) and the Ledger's openclip / version columns are built but not "
+    "yet verified on a real job, and relinking after Flame's publish is not "
+    "built yet.\n\n"
     "Read-only by default: nothing on a timeline changes until you allow "
     "changes in Settings.")
 
-# The banner on the Hub and Ledger tabs, worded so their unfinished state
-# is unmistakable. Public text — it says what Flame's API lacks, nothing more.
+# The banner on the Hub tab, worded so its unfinished state is unmistakable.
 WIP_NOTE = (
     "<b>UNDER DEVELOPMENT</b> — Flame's python API has no Create Source Segment "
-    "Connection and no Duplicate Connected Segment, and the connect → publish "
-    "workflow this tab is built for depends on both. Without them CCM hands "
-    "those steps to Flame's native tools and checks the result. Use it on a "
-    "copy of a job, not on a delivery.")
+    "Connection, and the connect step this tab is built for depends on it. "
+    "CCM hands that step to Flame's native tools and checks the result. Use "
+    "it on a copy of a job, not on a delivery.")
+
+# The Ledger tab's banner: what works today, and that the publish workflow
+# is coming soon.
+LEDGER_NOTE = (
+    "<b>COMING SOON</b> — the publish workflow. What's here is an early "
+    "version: after each Scan the table lists every hub shot and its Publish "
+    "NN snapshots, and changes nothing. Prep Publish and the Openclip / "
+    "Current / Latest columns are built but not yet verified on a real job, "
+    "and relinking after Flame's publish isn't built yet. Use it on a copy of "
+    "a job, not on a delivery.")
 
 
 # ====================================================================
@@ -5226,8 +5238,8 @@ class ConformManagerDialog(QtWidgets.QDialog):
         k = self.tabs.addTab(self._hub_tab_w, "Hub (WIP)")
         self.tabs.setTabToolTip(k, WIP_NOTE)
         self._led_tab_w = self._build_ledger_tab()
-        k = self.tabs.addTab(self._led_tab_w, "Ledger (WIP)")
-        self.tabs.setTabToolTip(k, WIP_NOTE)
+        k = self.tabs.addTab(self._led_tab_w, "Ledger (coming soon)")
+        self.tabs.setTabToolTip(k, LEDGER_NOTE)
         self.tabs.addTab(self._build_settings_tab(), "Settings")
         self._pv_tabs = {"tl": self._tl_tab_w, "cx": self._cx_tab_w,
                          "hub": self._hub_tab_w, "led": self._led_tab_w}
@@ -7711,9 +7723,9 @@ class ConformManagerDialog(QtWidgets.QDialog):
                      if n_fail else ""))
 
     # ---------------------------------------------------------------- Hub tab
-    def _wip_banner(self):
+    def _wip_banner(self, text=WIP_NOTE):
         """Always shown — not a Tip: the in-development status must not be missed."""
-        lb = QtWidgets.QLabel(WIP_NOTE)
+        lb = QtWidgets.QLabel(text)
         lb.setObjectName("wip")
         lb.setWordWrap(True)
         return lb
@@ -8686,7 +8698,7 @@ class ConformManagerDialog(QtWidgets.QDialog):
     def _build_ledger_tab(self):
         w = QtWidgets.QWidget()
         v = QtWidgets.QVBoxLayout(w)
-        v.addWidget(self._wip_banner())
+        v.addWidget(self._wip_banner(LEDGER_NOTE))
         top = QtWidgets.QHBoxLayout()
         self.led_label = _squish(QtWidgets.QLabel("Press Scan."))
         top.addWidget(self.led_label, 1)

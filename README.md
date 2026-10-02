@@ -7,10 +7,11 @@ have quietly split — across every spot and aspect version, in one window.
 Built around the **Conform Hub**: the one sequence that holds every shot of the
 job once, covering every frame any spot shows of it.
 
-> Status: 0.9.9 (beta) — the first public release; see the [Changelog](#changelog).
-> The audits and views are used on real jobs; the **Hub** and **Ledger** tabs are
-> in development. Read [Known limitations](#known-limitations) before running it
-> on production work.
+> Status: 0.9.10 (beta) — the first public release; see the [Changelog](#changelog).
+> The audits and views are used on real jobs. The **Hub** tab is in development,
+> and the publish workflow is coming soon: the **Ledger** tab shows the part of it
+> that's built so far. Read [Known limitations](#known-limitations) before running
+> it on production work.
 
 <img width="900" alt="CCM: the Timelines tab" src="docs/ccm_timelines.png" />
 
@@ -145,13 +146,17 @@ preview cache.
     `<hub name>_0010`, `_0020`, … in record order; a stacked shot takes one name.
   - **Remove from Hub…** — deletes the selected shots' hub segments (a ref that
     slipped in, say) and tries to close the gap. Experimental.
-- **Ledger (WIP)** — one row per hub shot showing how far it has got through
-  publishing: Shot, Hub Name, Forks, Snapshots, Openclip, Current, Latest and
-  State (an **OFF-LATEST** openclip has a newer version than the one in use).
+- **Ledger (coming soon)** — the part of the publish workflow that's built so
+  far; the full workflow is coming soon. After each Scan it lists every hub shot
+  and how far it has got through publishing: Shot, Hub Name, Forks, Snapshots,
+  Openclip, Current, Latest and State (an **OFF-LATEST** openclip has a newer
+  version than the one in use); the table itself changes nothing.
   **Prep Publish…** puts a frozen copy of each selected shot — copied, unlinked
   and given its own source — on a Publish NN track for Flame's own publish to
   run on; **Fix mode (replace current version)** re-does a bad publish on its
-  existing track.
+  existing track. Prep Publish, Fix mode and the Openclip, Current and Latest
+  columns are built but not yet verified on a real job, so run Prep Publish on a
+  copy of a job, not on a delivery.
 - **Settings** — **Conform Hub name** (Flame's "Sources Sequence" is always
   recognised too), **Default scope**, **Handle frames**, **Merge gap frames**,
   **Camera token** / **Camera match chars** (how the camera / roll name CCM groups
@@ -159,12 +164,11 @@ preview cache.
   detection), **Snapshot into** / **Publish tracks grow** (Ledger), **Mutations**
   and **State folder**. **Save Settings** saves and rescans.
 
-> **In development: the Hub (WIP) and Ledger (WIP) tabs.** Flame's Python API has
-> no scriptable Create Source Segment Connections (scoped) and no Duplicate
-> Connected Segment, and the connect → publish workflow these tabs are built for
-> depends on both. CCM hands those steps to Flame's native tools and checks the
-> result. Both tabs carry a banner that says so — use them on a copy of a job,
-> not on a delivery.
+> **In development: the Hub (WIP) tab.** Flame's Python API has no scriptable
+> Create Source Segment Connections (scoped), and the connect step this tab is
+> built for depends on them. CCM hands that step to Flame's native tools and
+> checks the result. The tab carries a banner that says so — use it on a copy of
+> a job, not on a delivery.
 
 ### The Conform Hub
 
@@ -297,14 +301,20 @@ selected in the Media Panel; the others follow what's open in Flame's
   the Timeline.** Open the right sequence before you Scan; **Open Sequences**
   covers its whole Desktop.
 - **Remove from Hub is experimental.** Check the hub afterwards.
-- **The Ledger and Prep Publish are in development** — the publish workflow
-  they belong to depends on the two steps Flame's Python API can't run.
+- **The full publish workflow is coming soon.** In the Ledger today,
+  **Prep Publish…** (Fix mode included) and the Openclip, Current and Latest
+  columns are built but not yet verified on a real job, and relinking after
+  Flame's publish isn't built yet — run Prep Publish on a copy of a job.
 
 
 ## Changelog
 
-### 0.9.9
+### 0.9.10
 - First public release (beta).
+- **Ledger (coming soon)** — the part of the publish workflow that's built so
+  far: every hub shot with its Publish NN snapshots and openclip versions, and
+  **Prep Publish…**, which asks before it changes anything. The full workflow
+  is coming soon.
 - **Duplicates inbox** with **Compare Sources**, **Merge into Primary…** and
   **Keep Both (Variants)**. Merge keeps each copy's cut and Timeline FX and
   checks that the source is truly shared afterwards.
