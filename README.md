@@ -1,8 +1,6 @@
 # Connected Conform Manager
 
-A Flame tool for **connected conforms**: one scan of every sequence in a scope
-shows which segments are the same shot, which share one real source and which
-have quietly split — across every spot and aspect version, in one window.
+A Flame tool geared toward demystifying, simplifying, and organizing all aspects of managing a **Connected Conform** throughout a campaign's lifecycle: manage duplicate segments, conform hub creation, shot publish, and managing shots across every spot and aspect--all in one window.
 
 Built around the **Conform Hub**: the one sequence that holds every shot of the
 job once, covering every frame any spot shows of it.
